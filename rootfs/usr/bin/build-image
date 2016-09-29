@@ -1,0 +1,60 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cat "${1:-/dev/stdin}" > /tmp/conf.json
+
+function readConf {
+    cat /tmp/conf.json \
+    | python -c \
+    "import sys, json;[sys.stdout.write(i + ' ') for i in json.load(sys.stdin)['${1}']]"
+}
+
+apt-get install -y $(readConf packages)
+
+mkdir /tmp/build/tmp
+mkdir /tmp/build/run
+mkdir -p /tmp/build/var/run
+
+cp -rp --parents /usr/share/zoneinfo/ /tmp/build/
+
+for e in $(readConf essentials); do
+    echo "Dockerizing ${e}..."
+    dockerize -n -o /tmp/build $(which "${e}")
+done
+
+for p in $(readConf bin); do
+    echo "Dockerizing ${p}..."
+    dockerize -n -o /tmp/build $(which "${p}")
+    echo "Copying misc files..."
+    find / -name "*${p}*" \
+        -not -path "/proc/*" \
+        -not -path "/tmp/*" \
+        -not -path "/sys*" \
+        -not -path "*/doc/*" \
+        -not -path "*/man/*" \
+        -not -path "*/bug/*" \
+        -not -path "*/share/*" \
+        -not -path "*/ucf/*" \
+        -not -path "*/dpkg/*" \
+        -not -path "*/rc*" \
+        -not -path "*/init*" \
+        -not -path "*/logrotate*" \
+        -not -path "*/cron*" \
+        -not -path "*/systemd*" | \
+        xargs cp -prv --parents -t /tmp/build
+
+    echo "Looking for .so runtime dependencies"
+    for s in $(find / -name "*.so" -path "*${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
+        ldd -v "${s}" \
+        | grep -v "${s}" \
+        | grep -Po "/(?:[a-z-\d_]+/?)+\.so(?:\.\d+)?" \
+        | sort \
+        | uniq \
+        | xargs cp -puv --parents -t /tmp/build/
+    done
+done
+
+cp --parents -p /etc/passwd /tmp/build
+cp --parents -p /etc/group /tmp/build
+cp "${DIR}/Dockerfile.tmp" /tmp/build/Dockerfile

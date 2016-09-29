@@ -1,0 +1,5 @@
+{
+  "essentials": ["ls", "chmod", "chown", "more", "cat", "sed", "bash", "sh"],
+  "packages": ["nginx"],
+  "bin": ["nginx"]
+}

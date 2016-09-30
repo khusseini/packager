@@ -12,8 +12,8 @@ function readConf {
 
 apt-get install -y $(readConf packages)
 
-mkdir /tmp/build/tmp
-mkdir /tmp/build/run
+mkdir -p /tmp/build/tmp
+mkdir -p /tmp/build/run
 mkdir -p /tmp/build/var/run
 
 cp -rp --parents /usr/share/zoneinfo/ /tmp/build/

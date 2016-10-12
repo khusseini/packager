@@ -1,0 +1,24 @@
+{
+  "pre-commands": [],
+  "post-commands": [],
+  "essentials": [
+    "env",
+    "ln",
+    "rm",
+    "ls",
+    "chmod",
+    "chown",
+    "env",
+    "mkdir",
+    "more",
+    "cat",
+    "sed",
+    "useradd",
+    "groupadd",
+    "bash",
+    "sh",
+    "dash"
+  ],
+  "packages": ["nginx"],
+  "bin": ["nginx"]
+}

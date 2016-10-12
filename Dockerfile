@@ -2,6 +2,8 @@ FROM ubuntu:16.04
 
 RUN apt-get update && \
     apt-get -y install \
+        wget \
+        curl \
         python-pip \
         git && \
         pip2 install --user git+http://github.com/larsks/dockerize.git

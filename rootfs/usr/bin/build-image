@@ -7,9 +7,20 @@ cat "${1:-/dev/stdin}" > /tmp/conf.json
 function readConf {
     cat /tmp/conf.json \
     | python -c \
-    "import sys, json;[sys.stdout.write(i + ' ') for i in json.load(sys.stdin)['${1}']]"
+    "import sys, json;[sys.stdout.write(i + '\n') for i in json.load(sys.stdin)['${1}']]"
 }
 
+function executeCommands {
+    IFS=$'\n'
+    for cmd in $(readConf ${1}); do
+        bash -c "${cmd}"
+    done
+}
+
+echo "Excecuting pre-commands..."
+executeCommands pre-commands
+
+apt-get update --fix-missing && \
 apt-get install -y $(readConf packages)
 
 mkdir -p /tmp/build/tmp
@@ -18,16 +29,25 @@ mkdir -p /tmp/build/var/run
 
 cp -rp --parents /usr/share/zoneinfo/ /tmp/build/
 
+IFS=$'\n'
 for e in $(readConf essentials); do
-    echo "Dockerizing ${e}..."
-    dockerize -n -o /tmp/build $(which "${e}")
+    e_path=$(which "${e}")
+    echo "Dockerizing ${e_path}..."
+    dockerize -n -o /tmp/build "${e_path}"
 done
 
+IFS=$'\n'
 for p in $(readConf bin); do
-    echo "Dockerizing ${p}..."
-    dockerize -n -o /tmp/build $(which "${p}")
+    bin_path="${p}"
+    if [ ! -f "${bin_path}" ]; then
+        bin_path=$(which "${bin_path}")
+    fi
+    echo "Dockerizing ${bin_path}..."
+
+    dockerize -n -o /tmp/build "${bin_path}"
+
     echo "Copying misc files..."
-    find / -name "*${p}*" \
+    find / -name "${p}*" \
         -not -path "/proc/*" \
         -not -path "/tmp/*" \
         -not -path "/sys*" \
@@ -41,11 +61,13 @@ for p in $(readConf bin); do
         -not -path "*/init*" \
         -not -path "*/logrotate*" \
         -not -path "*/cron*" \
-        -not -path "*/systemd*" | \
-        xargs cp -prv --parents -t /tmp/build
+        -not -path "*/systemd*" \
+        -not -path "/var/cache" \
+        -not -path "/etc/apt" \
+        | xargs cp -prv --parents -t /tmp/build
 
     echo "Looking for .so runtime dependencies"
-    for s in $(find / -name "*.so" -path "*${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
+    for s in $(find / -name "*.so" -path "${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
         ldd -v "${s}" \
         | grep -v "${s}" \
         | grep -Po "/(?:[a-z-\d_]+/?)+\.so(?:\.\d+)?" \
@@ -58,3 +80,6 @@ done
 cp --parents -p /etc/passwd /tmp/build
 cp --parents -p /etc/group /tmp/build
 cp "${DIR}/Dockerfile.tmp" /tmp/build/Dockerfile
+
+echo "Excecuting post-commands..."
+executeCommands post-commands

@@ -1,34 +1,32 @@
 Packager
 ===
 
-Create minimal "packages" for use in Docker.
+Create minimal docker images for applications based on Ubuntu packages
 
 Example:
 -
-Requirements: Clone repository
+
 ```bash
+git clone git@github.com:mozzymoz/packager.git
+cd packager/
 docker build -t packager .
-
-cat nginx_conf.json | docker run --name pckgr -ia stdin -v "${PWD}/build":/tmp/build packager
+cat examples/nginx.json | docker run --name pckgr -ia stdin -v "${PWD}/build":/tmp/build packager
 docker logs -f pckgr
-# Wait for the process to finish and view output log
-sudo chmown -R [youruser]:[yourgroup] ./build/
-cd build/
-docker build -t nginx .
-
+sudo docker build -t nginx build/
 docker run -d -p 8080:80 nginx /usr/bin/nginx -g 'daemon off;'
-
 curl -v http://localhost:8080
 ```
 
-Et voila, an nginx image that is not even 50MB small :)
+The resulting nginx images is less than 50MB small
 
 Configuration:
 -
 ```
 {
-    "essentials": [...] # List of essential binaries, like chmod, or ls
-    "packages": [...]   # Apt packages to install
-    "bin": [...]        # Binaries to extract e.g. nginx (no full path, only binary name)
+    "pre-commands": [...]        # List of bash commands to execute before build
+    "post-commands": [...]       # List of bash commands to execute after build  
+    "essentials": [ln, rm, ....] # List of essential binaries, like cp, mv ...
+    "packages": [...]            # Apt packages to install
+    "bin": [...]                 # Binaries to extract e.g. nginx or /usr/sbin/nginx
 }
 ```

@@ -1,5 +1,0 @@
-{
-  "essentials": ["env", "mkdir", "ls", "chown", "chmod", "more", "cat", "sed", "useradd", "groupadd", "bash", "sh"],
-  "packages": ["php", "php-fpm", "nginx", "php-xml", "php-curl", "php-mysql", "php-intl", "php-xdebug"],
-  "bin": ["php", "php-fpm7.0", "nginx"]
-}

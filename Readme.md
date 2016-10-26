@@ -10,10 +10,9 @@ Example:
 git clone git@github.com:mozzymoz/packager.git
 cd packager/
 docker build -t packager .
-cat examples/nginx.json | docker run --name pckgr -ia stdin -v "${PWD}/build":/tmp/build packager
-docker logs -f pckgr
-sudo docker build -t nginx build/
-docker run -d -p 8080:80 nginx /usr/bin/nginx -g 'daemon off;'
+cat examples/nginx.json | docker run --name pckgr -ia stdin -a stdout -a stderr packager > build.tar
+cat build.tar | docker import - nginx
+docker run -d -p 8080:80 nginx /usr/sbin/nginx -g 'daemon off;'
 curl -v http://localhost:8080
 ```
 

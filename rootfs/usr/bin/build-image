@@ -1,4 +1,4 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-./do-build-image > /dev/stderr && tar -czf - /tmp/build
+do-build-image > /dev/stderr && (cd /tmp/build && tar -cf - .)

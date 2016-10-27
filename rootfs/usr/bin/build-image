@@ -2,3 +2,5 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 do-build-image > /dev/stderr && (cd /tmp/build && tar -cf - .)
+
+exit 0

@@ -68,6 +68,7 @@ for p in $(readConf bin); do
 
     echo "Looking for .so runtime dependencies"
     for s in $(find / -name "*.so" -path "${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
+        echo "Checking ${s}..."
         ldd -v "${s}" \
         | grep -v "${s}" \
         | grep -Po "/(?:[a-z-\d_]+/?)+\.so(?:\.\d+)?" \
@@ -81,5 +82,9 @@ cp --parents -p /etc/passwd /tmp/build
 cp --parents -p /etc/group /tmp/build
 cp "${DIR}/Dockerfile.tmp" /tmp/build/Dockerfile
 
+rm /tmp/build/etc/nsswitch.conf
+
 echo "Excecuting post-commands..."
 executeCommands post-commands
+
+exit 0

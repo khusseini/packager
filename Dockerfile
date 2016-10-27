@@ -2,6 +2,9 @@ FROM ubuntu:16.04
 
 RUN apt-get update && \
     apt-get -y install \
+        build-essential \
+        autoconf \
+        automake \
         wget \
         curl \
         python-pip \

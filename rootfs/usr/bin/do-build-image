@@ -2,6 +2,8 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo "${1}"
+
 cat "${1:-/dev/stdin}" > /tmp/conf.json
 
 function readConf {
@@ -70,9 +72,10 @@ for p in $(readConf bin); do
         echo "Checking ${s}..."
         ldd -v "${s}" \
         | grep -v "${s}" \
-        | grep -Po "/(?:[a-z-\d_]+/?)+\.so(?:\.\d+)?" \
-        | sort \
-        | uniq \
+        | grep -Po "/([a-z\d()-_]+/?)[^:]" \
+        | tr ' ' '\n' \
+        | sort -u \
+        | sed '/^$/d' \
         | xargs cp -puv --parents -t /tmp/build/
     done
 done

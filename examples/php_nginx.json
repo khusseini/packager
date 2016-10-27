@@ -19,6 +19,14 @@
     "sh",
     "dash"
   ],
-  "packages": ["php", "php-fpm", "nginx", "php-xml", "php-curl", "php-mysql", "php-intl", "php-xdebug"],
-  "bin": ["php", "php-fpm7.0", "nginx"]
+  "packages": [
+    "php",
+    "php-fpm",
+    "php-xml",
+    "php-curl",
+    "php-mysql",
+    "php-intl",
+    "php-xdebug"
+  ],
+  "bin": ["php", "php-fpm7.0"]
 }

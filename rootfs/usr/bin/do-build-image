@@ -43,8 +43,7 @@ for p in $(readConf bin); do
         bin_path=$(which "${bin_path}")
     fi
     echo "Dockerizing ${bin_path}..."
-
-    dockerize -n -o /tmp/build "${bin_path}"
+    dockerize -n -o /tmp/build "${bin_path}" > /dev/null 2>&1
 
     echo "Copying misc files..."
     find / -name "${p}*" \
@@ -67,7 +66,7 @@ for p in $(readConf bin); do
         | xargs cp -prv --parents -t /tmp/build
 
     echo "Looking for .so runtime dependencies"
-    for s in $(find / -name "*.so" -path "${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
+    for s in $(find / -name "*.so" -path "*${p}*" -not -path "/sys/*" -not -path "/tmp/*"); do
         echo "Checking ${s}..."
         ldd -v "${s}" \
         | grep -v "${s}" \

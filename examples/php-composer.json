@@ -1,0 +1,49 @@
+{
+  "pre-commands": [],
+  "post-commands": [
+    "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\"",
+    "php composer-setup.php --install-dir=/tmp/build/usr/bin/ --filename=composer",
+    "php -r \"unlink('composer-setup.php');\""
+  ],
+  "essentials": [
+    "env",
+    "ln",
+    "rm",
+    "ls",
+    "chmod",
+    "chown",
+    "env",
+    "mkdir",
+    "more",
+    "cat",
+    "sed",
+    "useradd",
+    "groupadd",
+    "bash",
+    "sh",
+    "dash"
+  ],
+  "packages": [
+    "libcurl3",
+    "libedit-dev",
+    "libgd-dev",
+    "libmemcached-dev",
+    "libldb-dev",
+    "libxpm-dev",
+    "libxslt1-dev",
+    "libicu-dev",
+    "php",
+    "php-fpm",
+    "php-curl",
+    "php-xdebug",
+    "php-gd",
+    "php-intl",
+    "php-memcached",
+    "php-mbstring",
+    "php-mysql",
+    "php-mysqlnd",
+    "php-pear",
+    "php-xml"
+  ],
+  "bin": ["php", "php-fpm7.0"]
+}
